@@ -1,5 +1,6 @@
 package DAO;
 
+import classe.CandidateVoteCount;
 import classe.VoteType;
 import classe.VoteTypeCount;
 import classe.Voter;
@@ -33,7 +34,7 @@ public class DataRetriever {
         return 0;
     }
 
-    public List<VoteTypeCount> countVoteByTYpe(){
+    public List<VoteTypeCount> countVoteByType(){
         List<VoteTypeCount> results = new ArrayList<VoteTypeCount>();
         String sql = "select  vote_type, count(id) as count from vote group by vote_type";
 
@@ -45,6 +46,31 @@ public class DataRetriever {
                 VoteTypeCount votes = new VoteTypeCount();
                 votes.setCount(rs.getInt("count"));
                 votes.setVoteType(VoteType.valueOf(rs.getString("vote_type")));
+                results.add(votes);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return results;
+    }
+
+    public List<CandidateVoteCount> countCandidateVoteByType(){
+        List<CandidateVoteCount> results = new ArrayList<>();
+        String sql = "select c.name,\n" +
+                "       count(case when vote_type = 'VALID' then  1 end) as valid_vote\n" +
+                "from candidate c\n" +
+                "left join vote v\n" +
+                "on c.id = v.candidate_id\n" +
+                "group by c.name ";
+        try(Connection connection = dbConn.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()){
+
+            while (rs.next()){
+                CandidateVoteCount  votes = new CandidateVoteCount();
+                votes.setCandidateName(rs.getString("name"));
+                votes.setValidVoteCount(rs.getLong("valid_vote"));
                 results.add(votes);
             }
 

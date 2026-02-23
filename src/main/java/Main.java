@@ -5,7 +5,8 @@ public class Main {
         DataRetriever dr = new DataRetriever();
         System.out.println("total_vote: " + dr.countAllVotes());
 
-        System.out.println(dr.countVoteByTYpe());
+        System.out.println(dr.countVoteByType());
+        System.out.println(dr.countCandidateVoteByType());
 
 
     }
