@@ -1,8 +1,6 @@
 create database annexe2_push_down;
-\c annexe2_push_down;
 
-
-create user candidat with password 'élection';
+create user candidat with password 'election';
 alter user candidat with superuser;
 
 
