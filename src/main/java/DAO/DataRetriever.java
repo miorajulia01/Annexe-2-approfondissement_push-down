@@ -111,5 +111,28 @@ public class DataRetriever {
         return results;
     }
 
+    public ElectionResult findWinner(){
+        ElectionResult results = new ElectionResult();
+        String sql = "select c.name,\n" +
+                "       count(case when vote.vote_type = 'VALID' then 1 end) as valid_vote_count\n" +
+                "from vote\n" +
+                "left join candidate c\n" +
+                "on c.id = vote.candidate_id\n" +
+                "group by c.name\n" +
+                "order by valid_vote_count desc\n" +
+                "limit 1";
 
+        try (Connection connection = dbConn.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()){
+
+            while (rs.next()) {
+                results.setCandidateName(rs.getString("name"));
+                results.setValidVoteCount(rs.getLong("valid_vote_count"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return results;
+    }
 }
