@@ -8,6 +8,7 @@ public class Main {
         System.out.println(dr.countVoteByType());
         System.out.println(dr.countCandidateVoteByType());
         System.out.println(dr.computeVoteSummary());
+        System.out.println(dr.computeTurnoutRate());
 
 
     }
