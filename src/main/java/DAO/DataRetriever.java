@@ -1,9 +1,6 @@
 package DAO;
 
-import classe.CandidateVoteCount;
-import classe.VoteType;
-import classe.VoteTypeCount;
-import classe.Voter;
+import classe.*;
 import config.DatabaseConnection;
 
 import java.sql.Connection;
@@ -78,6 +75,29 @@ public class DataRetriever {
             throw new RuntimeException(e);
         }
         return results;
+    }
+
+    public VoteSummary computeVoteSummary(){
+        VoteSummary summary = new VoteSummary();
+        String sql = "select count(case when vote.vote_type = 'VALID' then 1 end) as valid_count,\n" +
+                "        count(case when vote.vote_type = 'BLANK' then 1 end) as blank_count,\n" +
+                "        count(case when vote.vote_type = 'NULL' then 1 end) as null_count\n" +
+                "from vote";
+
+       try(Connection connection = dbConn.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()){
+           if (rs.next()){
+               summary.setValidCount(rs.getLong("valid_count"));
+               summary.setBlackCount(rs.getLong("blank_count"));
+               summary.setNullCount(rs.getLong("null_count"));
+           }
+           return summary;
+       } catch (SQLException e) {
+           throw new RuntimeException(e);
+       }
+
+
     }
 
 }
